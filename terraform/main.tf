@@ -3,15 +3,10 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
-## Locate the existing resource group
-#data "azurerm_resource_group" "main" {
-#  name = var.resource_group_name
-#}
-
 ## Locate the existing custom image
 #data "azurerm_image" "image" {
-#  name                = "samtools-image"
-#  resource_group_name = var.resource_group_name
+#  name                = "ubuntu-18-04-lts-samtools"
+#  resource_group_name = azurerm_resource_group.rg.name
 #}
 
 resource "azurerm_batch_account" "batch_account" {
@@ -28,15 +23,15 @@ resource "azurerm_batch_pool" "pool" {
   vm_size             = "standard_d2s_v3"
   node_agent_sku_id   = "batch.node.ubuntu 20.04"
 
-    storage_image_reference {
-      publisher = "microsoft-azure-batch"
-      offer     = "ubuntu-server-container"
-      sku       = "20-04-lts"
-      version   = "latest"
-    }
+  storage_image_reference {
+    publisher = "microsoft-azure-batch"
+    offer     = "ubuntu-server-container"
+    sku       = "20-04-lts"
+    version   = "latest"
+  }
 
 #  storage_image_reference {
-#    id = "${data.azurerm_image.main.id}"
+#    id = data.azurerm_image.image.id
 #  }
 
   auto_scale {
