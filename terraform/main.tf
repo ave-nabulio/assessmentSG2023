@@ -3,24 +3,16 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
-# Locate the existing resource group
-data "azurerm_resource_group" "main" {
-  name = var.resource_group_name
-}
+## Locate the existing resource group
+#data "azurerm_resource_group" "main" {
+#  name = var.resource_group_name
+#}
 
-# Locate the existing custom image
-data "azurerm_image" "main" {
-  name                = "samtools-image"
-  resource_group_name = var.resource_group_name
-}
-
-resource "azurerm_storage_account" "storage_account" {
-  name                     = "virtualmachines12352334"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-}
+## Locate the existing custom image
+#data "azurerm_image" "image" {
+#  name                = "samtools-image"
+#  resource_group_name = var.resource_group_name
+#}
 
 resource "azurerm_batch_account" "batch_account" {
   name                 = var.batch_account_name
@@ -36,21 +28,21 @@ resource "azurerm_batch_pool" "pool" {
   vm_size             = "standard_d2s_v3"
   node_agent_sku_id   = "batch.node.ubuntu 20.04"
 
-  #  storage_image_reference {
-  #    publisher = "microsoft-azure-batch"
-  #    offer     = "ubuntu-server-container"
-  #    sku       = "20-04-lts"
-  #    version   = "latest"
-  #  }
+    storage_image_reference {
+      publisher = "microsoft-azure-batch"
+      offer     = "ubuntu-server-container"
+      sku       = "20-04-lts"
+      version   = "latest"
+    }
 
-  storage_image_reference {
-    id = "${data.azurerm_image.main.id}"
-  }
+#  storage_image_reference {
+#    id = "${data.azurerm_image.main.id}"
+#  }
 
   auto_scale {
     formula             = <<EOF
-      startingNumberOfVMs = 1;
-      maxNumberofVMs = 25;
+      startingNumberOfVMs = ${var.batch_pool_start_vm_number};
+      maxNumberofVMs = ${var.batch_pool_max_vm_number};
       pendingTaskSamplePercent = $PendingTasks.GetSamplePercent(180 * TimeInterval_Second);
       pendingTaskSamples = pendingTaskSamplePercent < 70 ? startingNumberOfVMs : avg($PendingTasks.GetSample(180 *   TimeInterval_Second));
       $TargetDedicatedNodes=min(maxNumberofVMs, pendingTaskSamples);
