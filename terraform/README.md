@@ -8,7 +8,7 @@
 ## Quickstart
 
 - Login to Azure CLI
-- Run `./scripts/init_infra.ps1` - to create the infrastructure with dev config (Windows powershell)
+- Run `./scripts/plan_apply.ps1` - to create the infrastructure with dev config (Windows powershell)
 - Run `./scripts/destroy_infra.ps1` - to destroy the infrastructure (Windows powershell)
 
 ## Scripts
