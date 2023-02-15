@@ -17,6 +17,5 @@ managed_image_name = "your image name"
 then
 
 - Login to Azure CLI
-- Run `./scripts/sanity_checks.ps1` - to check the code base is sane (Windows powershell)
 - Run `./scripts/build.ps1` - to build the image and publish it (Windows powershell)
     
