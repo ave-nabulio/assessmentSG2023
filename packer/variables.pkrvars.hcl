@@ -1,1 +1,0 @@
-ubuntu_image = "ubuntu:bionic"

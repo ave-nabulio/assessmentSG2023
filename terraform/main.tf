@@ -1,52 +1,50 @@
-resource "random_pet" "rg_name" {
-  prefix    = var.resource_group_name_prefix
-  separator = "" # Apparently, only numbers and letters in the names in Azure.
-}
-
-resource "random_pet" "ba_name" {
-  prefix    = var.batch_account_name_prefix
-  separator = ""
-}
-
-resource "random_pet" "pool_name" {
-  prefix    = var.batch_pool_name_prefix
-  separator = ""
-}
-
-resource "random_pet" "job_name" {
-  prefix    = var.batch_job_name_prefix
-  separator = ""
-}
-
-resource "random_pet" "task_name" {
-    prefix    = var.batch_task_name_prefix
-    separator = ""
-}
-
 resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
-  name     = random_pet.rg_name.id
+  name     = var.resource_group_name
+}
+
+# Locate the existing resource group
+data "azurerm_resource_group" "main" {
+  name = var.resource_group_name
+}
+
+# Locate the existing custom image
+data "azurerm_image" "main" {
+  name                = "samtools-image"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_storage_account" "storage_account" {
+  name                     = "virtualmachines12352334"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "GRS"
 }
 
 resource "azurerm_batch_account" "batch_account" {
-  name                 = random_pet.ba_name.id
+  name                 = var.batch_account_name
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   pool_allocation_mode = "BatchService"
 }
 
 resource "azurerm_batch_pool" "pool" {
-  name                = random_pet.pool_name.id
+  name                = var.batch_pool_name
   resource_group_name = azurerm_resource_group.rg.name
   account_name        = azurerm_batch_account.batch_account.name
   vm_size             = "standard_d2s_v3"
   node_agent_sku_id   = "batch.node.ubuntu 20.04"
 
+  #  storage_image_reference {
+  #    publisher = "microsoft-azure-batch"
+  #    offer     = "ubuntu-server-container"
+  #    sku       = "20-04-lts"
+  #    version   = "latest"
+  #  }
+
   storage_image_reference {
-    publisher = "microsoft-azure-batch"
-    offer     = "ubuntu-server-container"
-    sku       = "20-04-lts"
-    version   = "latest"
+    id = "${data.azurerm_image.main.id}"
   }
 
   auto_scale {
@@ -62,7 +60,11 @@ EOF
 }
 
 resource "azurerm_batch_job" "job1" {
-  name                = "minimalrequirementjob"
-  batch_pool_id       = azurerm_batch_pool.pool.id
+  name          = "minimalrequirementjob"
+  batch_pool_id = azurerm_batch_pool.pool.id
+}
 
+resource "azurerm_batch_job" "job2" {
+  name          = "samtooljob"
+  batch_pool_id = azurerm_batch_pool.pool.id
 }

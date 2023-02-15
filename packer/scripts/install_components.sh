@@ -19,3 +19,5 @@ apt-get update && apt-get install --no-install-recommends -y \
   ca-certificates \
   gawk &&
   apt-get autoclean && rm -rf /var/lib/apt/lists/*
+
+exit 0

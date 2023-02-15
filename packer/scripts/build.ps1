@@ -1,3 +1,15 @@
+param([string]$env = "dev")
+
 
 # Build machines using Packer
-packer build --var-file=variables.pkrvars.hcl --var-file=secrets.pkrvars.hcl docker-ubuntu.pkr.hcl
+if ("dev" -eq $env)
+{
+    packer build -var-file=variables_dev.pkrvars.hcl -var-file=secrets.pkrvars.hcl azure-ubuntu-image.pkr.hcl
+}
+if ("prd" -eq $env)
+{
+    packer build -var-file=variables_prd.pkrvars.hcl -var-file=secrets.pkrvars.hcl azure-ubuntu-image.pkr.hcl
+}
+{
+
+}

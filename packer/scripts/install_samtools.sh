@@ -12,3 +12,4 @@ wget https://github.com/samtools/samtools/releases/download/${SAMTOOLSVER}/samto
   make install &&
   mkdir /data
 
+exit 0
